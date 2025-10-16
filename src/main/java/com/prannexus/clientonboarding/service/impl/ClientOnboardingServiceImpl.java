@@ -1,5 +1,6 @@
 package com.prannexus.clientonboarding.service.impl;
 
+import com.prannexus.clientonboarding.dto.CandidateDTO;
 import com.prannexus.clientonboarding.dto.ClientOnboardingDto;
 import com.prannexus.clientonboarding.dto.NemsEmployeeDto;
 import com.prannexus.clientonboarding.dto.UserInputDTO;
@@ -77,6 +78,8 @@ public class ClientOnboardingServiceImpl implements ClientOnboardingService {
 
         String hrEmail = entity.getEmail();
         String password = generateRandomPassword();
+     // Create candidate first
+        createCandidate(clientCode, entity.getClientName());
 
         // 1️⃣ Create default employees in EMS first and get employeeCode
         String hrEmployeeCode;
@@ -186,7 +189,8 @@ public class ClientOnboardingServiceImpl implements ClientOnboardingService {
         hrDto.setEmail(username);
         hrDto.setPassword(password);
         hrDto.setClientCode(clientCode);
-        hrDto.setEmployeeCode(employeeCode);
+        hrDto.setEmpCode(employeeCode);
+
 
         UserRolesDTO hrRole = new UserRolesDTO();
         hrRole.setRoleTypeCode("HR");
@@ -201,6 +205,41 @@ public class ClientOnboardingServiceImpl implements ClientOnboardingService {
 
         if (!response.getStatusCode().is2xxSuccessful()) {
             throw new RuntimeException("Failed to create HR user via usermanagement service");
+        }
+    }
+    private void createCandidate(String clientCode, String clientName) {
+        RestTemplate restTemplate = new RestTemplate();
+
+        CandidateDTO candidate = new CandidateDTO();
+        candidate.setFirstName("HR");
+        candidate.setLastName(clientName);
+        candidate.setEmailAddres("hr@" + clientCode.toLowerCase() + ".com");
+        candidate.setEmploymentType("permanent");
+        candidate.setStatus("108"); 
+        candidate.setWorkflowStatus("Completed");
+        candidate.setCreatedBy("Prannexus");
+        candidate.setModifiedBy("Prannexus");
+        candidate.setDob(LocalDate.now());
+        candidate.setGender("Male");
+        candidate.setClientCode(clientCode);
+
+        // Optional fields to prevent Hibernate errors
+        candidate.setBudgetComment(null);
+        candidate.setManagementComment(null);
+        candidate.setVendorName(null);
+        candidate.setEmergencyMobileNo(null);
+
+        // Correct URL with 'isSaved' as query parameter
+        String url = "http://localhost:8085/nexushire/api/candidate/create?isSaved=true";
+
+        ResponseEntity<CandidateDTO> response = restTemplate.postForEntity(
+            url,
+            candidate,
+            CandidateDTO.class
+        );
+
+        if (!response.getStatusCode().is2xxSuccessful()) {
+            throw new RuntimeException("Failed to create candidate");
         }
     }
 

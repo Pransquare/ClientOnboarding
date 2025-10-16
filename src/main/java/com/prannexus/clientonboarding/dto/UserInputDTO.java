@@ -7,7 +7,8 @@ public class UserInputDTO {
     private String email;
     private String password;
     private String clientCode;
-    private String employeeCode;  // Add this field
+    private String empCode;
+  // Add this field
     private List<UserRolesDTO> roles;
 
     // Getters and Setters
@@ -23,9 +24,13 @@ public class UserInputDTO {
     public String getClientCode() { return clientCode; }
     public void setClientCode(String clientCode) { this.clientCode = clientCode; }
 
-    public String getEmployeeCode() { return employeeCode; }
-    public void setEmployeeCode(String employeeCode) { this.employeeCode = employeeCode; }  // Add setter
-
-    public List<UserRolesDTO> getRoles() { return roles; }
+    
+    public String getEmpCode() {
+		return empCode;
+	}
+	public void setEmpCode(String empCode) {
+		this.empCode = empCode;
+	}
+	public List<UserRolesDTO> getRoles() { return roles; }
     public void setRoles(List<UserRolesDTO> roles) { this.roles = roles; }
 }
